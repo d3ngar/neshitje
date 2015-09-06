@@ -1,0 +1,124 @@
+body {
+  padding-top: 107px;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  color: #535353;
+}
+
+a {
+	color: #129793;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+	color: #ff7260;
+}
+
+h1 {
+  font-size: 2em;
+  color: #129793;
+  text-shadow:1px 1px 1px rgba(153,153,153,1);
+  margin-top: 3px;
+}
+
+h2 {
+  font-size: 1.6em;
+  color: #129793;
+}
+
+h3 {
+  font-size: 1.4em;
+  color: #535353;
+}
+
+label {
+  color: #535353;
+}
+
+.left-right {
+  float:left;
+}
+
+#navbar-brand {
+  color: #129793;
+  text-shadow:1px 1px 1px rgba(84,84,84,1);
+  float: left;
+  font-variant: small-caps;
+  letter-spacing: 0pt;
+  word-spacing: -4pt;
+}
+
+#logo-header {
+  color: #129793;
+  text-shadow:1px 1px 1px rgba(84,84,84,1);
+  float: left;
+  font-variant: small-caps;
+  letter-spacing: 0pt;
+  word-spacing: -4pt;
+  background-color: #ffffff;
+}
+
+#logo-header a {
+  color: #129793;
+}
+
+
+#logo-header a:hover {
+  color: #ff7260;
+  text-decoration: none;
+}
+
+#tagline {
+	font-size: 1.4em;
+	bottom: 3px;
+	left: 175px;
+  padding-top: 16px;
+}
+
+#top-navigation {
+  background-color: #ffffff;
+  border-color: #398439;
+}
+
+#impliedsubmit {
+  background-color: #5cb85c;
+  color: #ffffff;
+}
+
+.add-to-basket {
+  font-size: 1.3em;
+  margin: 30px 35px;
+  padding: 10px 35px;
+}
+
+@media screen and (min-width: 992px) {
+  #logo-header {
+    font: bold 36px/100% trebuchet MS,  Helvetica, Arial, sans-serif;
+    padding-top: 7px;
+  }
+
+  #small-logo-header { display: none; }
+
+}
+
+@media screen and (max-width: 991px) {
+  body {
+    padding-top: 60px;
+  }
+
+  #logo-header {
+      display: none;
+  }
+
+  #tagline { display: none; }
+}
+
+
+@media screen and (max-width: 767px) {
+  body {
+    padding-top: 60px;
+  }
+
+  #logo-header {
+      display: none;
+  }
+}
