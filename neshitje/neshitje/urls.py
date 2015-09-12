@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^pages/', include('main_app.urls', namespace="main_app")),
     url(r'^product/', include('product.urls', namespace="product")),
     url(r'^search/', include('search.urls', namespace="search")),
+    url(r'^user_details/', include('user_details.urls', namespace="user_details")),
     #url(r'^order/', include('order.urls', namespace="order")),
     url(r'^', include('main_app.urls', namespace = "main_app")),
 )

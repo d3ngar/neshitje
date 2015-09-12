@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -14,8 +15,9 @@ class SourceID(models.Model):
 
 
 class CookieTracker(models.Model):
-    source_id = models.IntegerField(blank=True, null=True)
+    source = models.ForeignKey(SourceID)
     date_added = models.DateTimeField("Date Created")
+    session_owner = models.ForeignKey(User, blank=True, null=True)
 
     def __str__(self):
         return self.id

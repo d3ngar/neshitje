@@ -33,6 +33,7 @@ class UserSessionTracking(object):
 
 
         print "Referrer: " + referrer
+        print "Current URL " + request.path
         print "User Agent: " + request.META['HTTP_USER_AGENT']
         print "Client IP: " + request.META['REMOTE_ADDR']
         print "Query String: " + request.META['QUERY_STRING']
