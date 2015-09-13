@@ -97,3 +97,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# recaptcha
+RECAPTCHA_PUBLIC_KEY = Secrets.captcha_site_key
+RECAPTCHA_PRIVATE_KEY = Secrets.captcha_secret_key
