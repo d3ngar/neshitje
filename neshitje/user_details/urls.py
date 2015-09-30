@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^postal-done', views.postal_done, name='postal-done'),
     url(r'^my-account', views.account, name='account'),
     url(r'^simple-form', views.simple_form, name='simple-form'),
+    url(r'^login', views.login_process, name='login'),
+    url(r'^logout', views.logout_process, name='logout'),
 ]

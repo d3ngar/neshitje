@@ -110,6 +110,10 @@ label {
   }
 
   #tagline { display: none; }
+
+  h1 {font-size: 1.6em;}
+  h2 {font-size: 1.3em;}
+  h3 {font-size: 1.2em;}
 }
 
 
@@ -117,6 +121,10 @@ label {
   body {
     padding-top: 60px;
   }
+
+  h1 {font-size: 1.4em;}
+  h2 {font-size: 1.2em;}
+  h3 {font-size: 1.1em;}
 
   #logo-header {
       display: none;
