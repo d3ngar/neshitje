@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
-from .forms import RegisterBaseForm
+from .forms import RegisterBaseForm, UserRegForm
 from django.contrib import auth
 from django.core.context_processors import csrf
 
@@ -12,23 +12,7 @@ import main_app.recaptcha_simple
 
 ### From here on is views: ###
 def add_billing(request):
-    if request.method == 'POST':
-
-        response = main_app.recaptcha_simple.submit(request.POST.get('g-recaptcha-response'), request.META['REMOTE_ADDR'])
-        #print "reCaptcha: " + request.POST.get('g-recaptcha-response')
-        #print "remote: " + request.META['REMOTE_ADDR']
-        #print response.is_valid
-
-        if response.is_valid:
-            # process your form now
-            print "Form passed!"
-            return render(request, 'user_details/add_billing_address.html', {})
-        else:
-            # return the form
-            print "Form not passed. Recaptcha wrong."
-            response = redirect('user_details:register')
-            response['Location'] += '?fail=recaptcha'
-            return response
+    return render(request, 'user_details/add_billing_address.html', {})
 
 def add_postal(request):
     return render(request, 'user_details/add_postal_address.html', {})
@@ -47,24 +31,56 @@ def login_process(request):
         response = redirect('user_details:register')
         return response
 
-    c = {}
-    c.update(csrf(request))
-
-
-
 def logout_process(request):
     auth.logout(request)
     return redirect('main_app:homepage')
 
 def register(request):
-    return render(request, 'user_details/register_base.html', {})
+    if request.method == 'POST':
+        #print request
+        response = main_app.recaptcha_simple.submit(request.POST.get('g-recaptcha-response'), request.META['REMOTE_ADDR'])
+        if response.is_valid:
+            form = UserRegForm(request.POST)
+            if form.is_valid():
+                print "User reg form success"
+                form.save()
+                if request.POST.get('details') == 'submit':
+                    response = redirect('user_details:add-billing')
+                else:
+                    response = redirect('user_details:account')
+                return response
+            else:
+                return render(request, 'user_details/register_base.html', {'form' : form})
+        else:
+            # return the form
+            print "Form not passed. Recaptcha wrong."
+            response = redirect('user_details:register')
+            response['Location'] += '?fail=recaptcha'
+            return response
+
+    form = UserRegForm()
+    return render(request, 'user_details/register_base.html', {'form' : form})
+
+
 
 def postal_done(request):
-    return render(request, 'user_details/my-account', {})
+    return render(request, 'user_details/account.html', {})
 
 def account(request):
     return render(request, 'user_details/account.html', {})
 
+
+## This one is mainly to try around in.
 def simple_form(request):
-    form = RegisterBaseForm()
+    if request.method == 'POST':
+        form = UserRegForm(request.POST)
+        if form.is_valid():
+            print "User reg form success"
+            form.save()
+            response = redirect('user_details:account')
+            return response
+        else:
+            return render(request, 'user_details/simple_form.html', {'form' : form})
+
+    form = UserRegForm()
     return render(request, 'user_details/simple_form.html', {'form' : form})

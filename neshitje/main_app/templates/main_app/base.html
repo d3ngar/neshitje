@@ -60,6 +60,7 @@
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Cheat Section<span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="{% url 'user_details:account' %}">User Account</a></li>
+            <li><a href="{% url 'user_details:simple-form' %}">Simple Form</a></li>
             <li><a href="{% url 'product:product' %}">Product Page</a></li>
             <li><a href="{% url 'search:search' %}">Search Page</a></li>
             <li><a href="{% url 'search:search_results' %}">Search Results Page</a></li>
@@ -77,12 +78,13 @@
         <li><a href="{% url 'user_details:register' %}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
         <li><a href="#" data-toggle="modal" data-target="#signupModal"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
       </ul>
-
-
-
     </div>
   </div>
+  {% block subnav %}
+  {% endblock %}
   </nav>
+  {% block extrapadding %}
+  {% endblock %}
 
 
   <!-- Modal -->
@@ -110,16 +112,23 @@
           </form>
           <div class="text-right"><button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button></div>
         </div>
+        <div class="modal-footer">
+          <span>Or <a href="{% url 'user_details:register' %}" >create an account</a> or use this form to retrieve your password.</span>
+        </div>
       </div>
     </div>
   </div>
   {% endblock %}
 
+
+
+  <!-- This part should really be removed -->
   <div style="min-height: 520px;">
   {% block content %}
 
 
   {% endblock %}
+  <!-- This part should really be removed -->
   </div>
 
   {% block footer %}

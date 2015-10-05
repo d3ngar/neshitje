@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from nonrepofiles.secrets import Secrets
+#Basedir
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -37,6 +38,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # installed apps
+    'crispy_forms',
+    'bootstrap3',
+    'widget_tweaks',
+    # written apps
     'main_app',
     'user_track',
     'search',

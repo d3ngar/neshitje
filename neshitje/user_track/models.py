@@ -9,22 +9,24 @@ from django.contrib.auth.models import User
 class SourceID(models.Model):
     source_name = models.CharField(max_length=60)
     http_ref = models.CharField(max_length=80, blank=True, null=True)
+    date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
+    status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)
+    status = models.IntegerField(default=1)
 
     def __str__(self):
         return self.source_name
 
 
 class CookieTracker(models.Model):
-    source = models.ForeignKey(SourceID)
+    source = models.ForeignKey(SourceID, default=1)
     date_added = models.DateTimeField("Date Created")
-    session_owner = models.ForeignKey(User, blank=True, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class SessionTracker(models.Model):
-    source_id = models.IntegerField(SourceID)
+    source_id = models.ForeignKey(SourceID, default=1)
     ref_url = models.CharField(max_length=1024)
     session_start = models.DateTimeField("Date time created")
     ip_v4 = models.CharField(max_length=14)
@@ -35,9 +37,10 @@ class SessionTracker(models.Model):
     cookie = models.ForeignKey(CookieTracker)
     mktg_trck_id = models.CharField(max_length=20)
     language_code = models.CharField(max_length=3)
+    session_owner = models.IntegerField(User, blank=True, null=True)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class PageTracker(models.Model):
@@ -53,4 +56,4 @@ class PageTracker(models.Model):
     language_code = models.CharField(max_length=5, default="en-gb")
 
     def __str__(self):
-        return self.id
+        return str(self.id)
