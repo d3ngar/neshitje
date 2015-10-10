@@ -10,8 +10,9 @@
             <div class="panel-heading">Account Details</div>
             <div class="panel-body">
               <a href="#" />Profile Settings</a><br />
-              <a href="#" />Billing Address</a><br />
-              <a href="#" />Postal Addresses</a><br />
+              <a href="{% url 'user_details:add-billing' %}" />Billing Address</a><br />
+              <a href="{% url 'user_details:add-postal' %}" />Postal Addresses</a><br />
+              <a href="{% url 'user_details:logout' %}" title="Logout" />Logout</a><br />
             </div>
           </div>
 

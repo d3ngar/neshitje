@@ -1,15 +1,15 @@
 {% extends "main_app/base.html" %}
-
+{% load widget_tweaks %}
 {% block content %}
 
 <script type="text/javascript">
-  function validateForm() {
-    var add01 = document.getElementById('address1');
-    var add02 = document.getElementById('address2');
-    var add03 = document.getElementById('address3');
-    var pc = document.getElementById('post_code');
-    var cit = document.getElementById('city');
-    var nick = document.getElementById('nick');
+  function ValidateAccount() {
+    var add01 = document.getElementById('id_address_line_1');
+    var add02 = document.getElementById('id_address_line_2');
+    var add03 = document.getElementById('id_address_line_3');
+    var pc = document.getElementById('id_post_code');
+    var cit = document.getElementById('id_city');
+    var nick = document.getElementById('id_address_nick');
 
     if (add01.value.length < 6) {
       alert("Address Line 1 cannot be empty and must be at least 6 characters");
@@ -36,49 +36,61 @@
 </script>
 
 
+<div class="container-fluid">
+  <h1>Postal Addresses</h1>
+</div>
+
+{% if postals %}
+  <div class="container">
+    <h2>Current registered addresses</h2>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Address Nick</th>
+          <th>Address Line 1</th>
+          <th>Address Line 2</th>
+          <th>Address Line 3</th>
+          <th>City</th>
+          <th>Post Code</th>
+          <th>delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for line in postals %}
+          <tr>
+            <td>{{ line.address_nick }}</td>
+            <td>{{ line.address_line_1 }}</td>
+            <td>{{ line.address_line_2 }}</td>
+            <td>{{ line.address_line_3 }}</td>
+            <td>{{ line.city }}</td>
+            <td>{{ line.post_code }}</td>
+            <td><a href="{% url 'user_details:del-postal' %}?postalid={{ line.id }}" title="delete">{{ line.post_code }}</a></td>
+          </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+
 <div class="container">
-  <h1>Your postal address</h1>
-  <form name="billing_form" class="form-horizontal" role="form" method="post" onsubmit="return ValidateAccount();" action="{% url 'user_details:postal-done'">
+  <h2>Add Delivery Address</h2>
+  <form name="billing_form" class="form-horizontal" role="form" method="post" onsubmit="return ValidateAccount();" action="{% url 'user_details:add-postal' %}">
     {% csrf_token %}
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="nick">Address Nick*:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="nick" placeholder="Address Nickname (ie: home)" name="nick">
+
+    {% for field in form %}
+      <div class="form-group">
+          {{ field.errors.as_text }}
+        <label class="control-label col-sm-2" for="{{ field.id_for_label }}"> {{ field.label }}: </label>
+        <div class="col-sm-10">
+          {% render_field field class+="form-control" %}
+        </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="address1">Address Line 1*:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="address1" placeholder="Address Line 1" name="address1">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="address2">Address Line 2:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="address2" placeholder="Address Line 2" name="address3">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="address3">Address Line 3:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="address3" placeholder="Address Line 3" name="address3">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="post_code">Post Code*:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="post_code" placeholder="Post Code" name="post_code">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="city">City*:</label>
-      <div class="col-sm-10">
-        <input type="text" class="form-control" id="city" placeholder="City" name="city">
-      </div>
-    </div>
+    {% endfor %}
+
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
-        <div class="text-right"><button type="submit" class="btn btn-success" name="save"  value="save">Save</button></div>
+        <div class="left-right"><button type="submit" class="btn btn-success" name="save"  value="save">Save</button></div>
       </div>
     </div>
   </form>

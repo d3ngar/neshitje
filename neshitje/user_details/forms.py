@@ -1,9 +1,11 @@
 from django import forms
+from django.forms import ModelForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import UserDetail, UserBilling, UserShipping
 from .validators import validate_email_unique
 
+"""
 class RegisterBaseForm(forms.Form):
     first_name = forms.CharField(label="Firstname")
     last_name =  forms.CharField(label="Lastname")
@@ -11,6 +13,7 @@ class RegisterBaseForm(forms.Form):
     email = forms.CharField(label="Email")
     password = forms.CharField(widget=forms.PasswordInput())
     confirm_password = forms.CharField(widget=forms.PasswordInput())
+"""
 
 class UserRegForm(UserCreationForm):
     first_name = forms.CharField(label="Firstname")
@@ -33,3 +36,32 @@ class UserRegForm(UserCreationForm):
             detail.save()
 
         return user
+
+class BillingForm(forms.ModelForm):
+    class Meta:
+        model = UserBilling
+        fields = ['address_line_1', 'address_line_2', 'address_line_3', 'city', 'post_code']
+
+    def save(self, u, commit=True):
+        model = UserBilling(address_line_1 = self.cleaned_data['address_line_1'], address_line_2 = self.cleaned_data['address_line_2'], address_line_3 = self.cleaned_data['address_line_3'], city = self.cleaned_data['city'], post_code = self.cleaned_data['post_code'], user = u)
+
+        if commit:
+            model.save()
+        return model
+
+
+class PostalForm(forms.ModelForm):
+    class Meta:
+        model = UserShipping
+        fields = ['address_nick', 'address_line_1', 'address_line_2', 'address_line_3', 'city', 'post_code']
+
+    def save(self, u, commit=True):
+        model = UserShipping(address_line_1 = self.cleaned_data['address_line_1'], address_line_2 = self.cleaned_data['address_line_2'], address_line_3 = self.cleaned_data['address_line_3'], city = self.cleaned_data['city'], post_code = self.cleaned_data['post_code'], user = u, address_nick = self.cleaned_data['address_nick'])
+
+        if commit:
+            model.save()
+        return model
+
+class LoginForm(forms.Form):
+    username = forms.CharField(label="username")
+    password = forms.CharField(label="password", widget=forms.PasswordInput())

@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^simple-form', views.simple_form, name='simple-form'),
     url(r'^login', views.login_process, name='login'),
     url(r'^logout', views.logout_process, name='logout'),
+    url(r'^logging', views.logging, name='logging'),
+    url(r'^delete-postal', views.delete_postal, name='del-postal'),
 ]

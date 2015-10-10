@@ -30,13 +30,14 @@ class UserBilling(models.Model):
     status = models.IntegerField(default=1)
 
     def __str__(self):
-        return self.address_line_1 + "|" + self.address_line_2  + "|" +  self.post_code + "|" + self.city
+        return str(self.id)
 
 
 class UserShipping(models.Model):
     address_line_1 = models.CharField(max_length=55, blank=True, null=True)
     address_line_2 = models.CharField(max_length=55, blank=True, null=True)
     address_line_3 = models.CharField(max_length=55, blank=True, null=True)
+    city = models.CharField(max_length=55, blank=True, null=True)
     post_code = models.CharField(max_length=10, blank=True, null=True)
     address_nick = models.CharField(max_length=55, blank=True, null=True)
     date_created = models.DateTimeField("Date time created", auto_now_add=True, auto_now=False)

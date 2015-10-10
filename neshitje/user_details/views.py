@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
-from .forms import RegisterBaseForm, UserRegForm
 from django.contrib import auth
 from django.core.context_processors import csrf
+from .forms import UserRegForm, BillingForm, PostalForm, LoginForm
+from .models import UserBilling, UserShipping
 
 import main_app.recaptcha_simple
 
@@ -12,10 +13,89 @@ import main_app.recaptcha_simple
 
 ### From here on is views: ###
 def add_billing(request):
-    return render(request, 'user_details/add_billing_address.html', {})
+    if request.user.is_authenticated():
+        user_id = request.user
+        billing = UserBilling.objects.get(user_id=user_id, status=1)
+
+        if billing is not None:
+            if request.method == 'POST':
+                billing.status = 3
+                billing.save()
+                form = BillingForm(request.POST)
+                if form.is_valid():
+                    form.save(user_id)
+                    response = redirect('user_details:account')
+                    return response
+            form = BillingForm(instance=billing)
+            return render(request, 'user_details/add_billing_address.html', {'form' : form})
+
+        elif request.method == 'POST':
+            form = BillingForm(request.POST)
+            if form.is_valid():
+                print "Billing success"
+                form.save(user_id)
+
+                if request.POST.get('save') == 'submit':
+                    response = redirect('user_details:account')
+                elif request.POST.get('add_shipping') == 'submit':
+                    response = redirect('user_details:add-shipping')
+                return response
+
+            return render(request, 'user_details/add_billing_address.html', {'form' : form})
+        else:
+            form = BillingForm()
+            return render(request, 'user_details/add_billing_address.html', {'form': form})
+
+    else:
+        response = redirect('user_details:logging')
+        return response
+
 
 def add_postal(request):
-    return render(request, 'user_details/add_postal_address.html', {})
+    if request.user.is_authenticated():
+        user_id = request.user
+        postals = UserShipping.objects.filter(user_id=user_id, status=1)
+
+        if request.method == 'POST':
+            form = PostalForm(request.POST)
+            if form.is_valid():
+                print "Postal success"
+                form.save(user_id)
+                response = redirect('user_details:account')
+                return response
+
+            return render(request, 'user_details/add_postal_address.html', {'form' : form, 'postals':postals})
+        else:
+            form = PostalForm()
+            return render(request, 'user_details/add_postal_address.html', {'form': form, 'postals':postals})
+
+    else:
+        response = redirect('user_details:logging')
+        return response
+
+
+def logging(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid:
+            username = request.POST.get('username', '')
+            password = request.POST.get('password', '')
+
+            user = auth.authenticate(username=username, password=password)
+
+            if user is not None:
+                auth.login(request, user)
+                response = redirect('user_details:account')
+                return response
+            else:
+                response = redirect('user_details:register')
+                return response
+        else:
+            return render(request, 'user_details/logging.html', {'form': form})
+    else:
+        form = LoginForm()
+        return render(request, 'user_details/logging.html', {'form': form})
+
 
 def login_process(request):
     username = request.POST.get('username', '')
@@ -31,9 +111,11 @@ def login_process(request):
         response = redirect('user_details:register')
         return response
 
+
 def logout_process(request):
     auth.logout(request)
     return redirect('main_app:homepage')
+
 
 def register(request):
     if request.method == 'POST':
@@ -61,13 +143,23 @@ def register(request):
     form = UserRegForm()
     return render(request, 'user_details/register_base.html', {'form' : form})
 
+def delete_postal(request):
+    if request.method == 'GET':
+        postal_id = request.GET.get('postalid', None)
+        post_add = UserShipping.objects.get(id=postal_id)
+        post_add.status = 3
+        post_add.save();
+    return render(request, 'user_details/account.html', {})
 
 
 def postal_done(request):
     return render(request, 'user_details/account.html', {})
 
+
+
 def account(request):
     return render(request, 'user_details/account.html', {})
+
 
 
 ## This one is mainly to try around in.

@@ -2,6 +2,9 @@ from datetime import datetime
 from django.db import models
 from django.utils import timezone
 from user_track.models import PageTracker, SessionTracker, CookieTracker
+import xml.etree.ElementTree as ET
+import urllib2
+import json
 
 class UserSessionTracking(object):
 
@@ -14,16 +17,42 @@ class UserSessionTracking(object):
             return True
 
 
+    def getGeoIPXML(self, ip):
+        geo_ip = {}
+
+        try:
+            url = "http://freegeoip.net/xml/" + ip
+            print url
+            f = urllib2.urlopen( url )
+            tree = ET.ElementTree(file=f)
+            address_element = tree.getroot()
+            geo_ip = dict((e.tag, e.text) for e in address_element.getchildren())
+        except:
+            geo_ip = {'error':'Geo IP error'}
+        return geo_ip
+
+
+    def getGeoIPJSON(self, ip):
+        url = "http://geoip.nekudo.com/api/" + ip + "/en/short"
+        f = urllib2.urlopen(url).read()
+        json_data = json.loads(f)
+        return json_data
+
+
     def process_request(self, request):
         ## Stuff that comes from the page meta
 
+        ip = request.META['REMOTE_ADDR']
+
         print "=== Middleware User Session tracking executed ==="
+
 
         auth_user = None
         try:
-            auth_user = request.META['REMOTE_USER']
+            auth_user = request.user
         except KeyError:
             auth_user = "None"
+
 
         referrer = None
         try:
@@ -35,9 +64,9 @@ class UserSessionTracking(object):
         print "Referrer: " + referrer
         print "Current URL " + request.path
         print "User Agent: " + request.META['HTTP_USER_AGENT']
-        print "Client IP: " + request.META['REMOTE_ADDR']
+        print "Client IP: " + ip
         print "Query String: " + request.META['QUERY_STRING']
-        print "User: " + auth_user
+        print "User: " + str(auth_user)
         print "Remote Host: " + request.META['REMOTE_HOST']
 
 
@@ -55,6 +84,8 @@ class UserSessionTracking(object):
         if not request.session.get('cookie_id', False):
             print "no such cookie exists"
             cookie = CookieTracker (date_added=timezone.now())
+            geoip = self.getGeoIPJSON(ip)
+            print geoip
             cookie.save()
             request.session['cookie_id'] = cookie.id
             request.session['last_visit'] = datetime.strftime(now, "%Y-%m-%d %H:%M:%S")
