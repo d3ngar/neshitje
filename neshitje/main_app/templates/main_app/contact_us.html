@@ -1,0 +1,61 @@
+{% extends "main_app/base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+
+  <div class="container-fluid">
+    <h1>Get in touch...</h1>
+    <div id="contact-map">
+      <div class="col-md-4" id="map-intro">
+        <h2>Where we are:</h2>
+        <div id="map-lore">
+          <span>In the ideallic outskirts of London, in beautiful Hillingdon, Conveniently located within 20 minutes to Heathrow and 40 minutes into central London. Just where the A40 meets the M40 and M25.</span>
+        </div>
+      </div>
+      <div class="col-md-8" id="map-view">
+
+        <img title="Our Office Location" src="http://maps.googleapis.com/maps/api/staticmap?center=London&key=AIzaSyBx-Q-iEbDA7oUipQcElWLAu_NATEV3HXg&size=750x350&zoom=10&style=saturation:-100|lightness:-10|gamma:0.75&style=feature:landscape|element:geometry|saturation:-100&markers=color:0x129793|label:N|51.5357817,-0.4527881&style=feature:road.highway|element:labels.icon|visibility:off" />
+
+      </div>
+    </div>
+    <div class="col-md-12">
+      <hr>
+    </div>
+    <div id="contactly">
+      <div class="col-md-offset-2 col-md-4" >
+        <h2>Address:</h2>
+        <div id="address">
+          Ne Shitje<br/>
+          34 The Larches<br/>
+          UB10 0DJ<br/>
+          London, UK<br/>
+          t) +44 1895 460 705<br/>
+          e) <a href="mailto:info@neshitje.com?subject=1359|" title="send us a letter">info @ neshitje . com</a>
+        </div>
+      </div>
+      <hr>
+      <div class="col-md-offset-1 col-md-5" >
+        <h2>Contact Form:</h2>
+        <div id="address">
+          <form method="post" action="{% url 'main_app:contact' %}" class="form-horizontal" role="form" >
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="form-group">
+                {{ field.errors.as_text }}
+              <label class="control-label col-sm-2" for="{{ field.id_for_label }}"> {{ field.label }}: </label>
+              <div class="col-sm-10" id="message-small">
+                {% render_field field class+="form-control" rows=7 placeholder="required" %}
+              </div>
+            </div>
+            {% endfor %}
+
+            <div class="form-group">
+                <div class="text-right" style="padding-right: 15px;"><button type="submit" class="btn btn-success glyphicon glyphicon-envelope " name="send" value="submit"> Send</button></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}

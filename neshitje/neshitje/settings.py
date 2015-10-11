@@ -98,6 +98,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Setting up all sorts of email things:
+# For email
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+EMAIL_HOST = Secrets.email_host
+EMAIL_PORT = 465
+EMAIL_USERNAME = Secrets.email_username
+EMAIL_PASSWORD = Secrets.email_password
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/

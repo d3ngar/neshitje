@@ -25,6 +25,9 @@
 </head>
 
 <body>
+  {# Include this for Google Tagmanager #}
+  {% include "main_app/tagmanager.html" %}
+
   {% block navigation %}
   <nav class="navbar navbar-fixed-top navbar-default">
     <div id="logo-header" class="container-fluid"><a href="/" title="N&#235; Shitje Homepage">N&#235; Shitje</a></div>
@@ -54,8 +57,8 @@
             <li><a href="#">Clothing</a></li>
           </ul>
         </li>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Customer Care</a></li>
+        <li><a href="#">About Ne Shitje</a></li>
+        <li><a href="{% url 'main_app:contact' %}">Contact Us</a></li>
         <li class="dropdown">
           <a class="dropdown-toggle" data-toggle="dropdown" href="#">Cheat Section<span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -132,7 +135,7 @@
   </div>
 
   {% block footer %}
-    <div class="container-fluid">
+    <div class="container-fluid" id="footer">
       <div>
         Footer Links
       </div>
