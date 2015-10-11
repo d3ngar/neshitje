@@ -39,9 +39,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # installed apps
-    'crispy_forms',
-    'bootstrap3',
+    #'crispy_forms',
+    #'bootstrap3',
     'widget_tweaks',
+    'sorl.thumbnail',
     # written apps
     'main_app',
     'user_track',
@@ -103,6 +104,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_ROOT = '/home/dengar/Documents/development/neshitje/neshitje/media/uploads/'
+#MEDIA_URL = ''
 
 # recaptcha
 RECAPTCHA_PUBLIC_KEY = Secrets.captcha_site_key

@@ -15,21 +15,25 @@ import main_app.recaptcha_simple
 def add_billing(request):
     if request.user.is_authenticated():
         user_id = request.user
-        billing = UserBilling.objects.get(user_id=user_id, status=1)
 
-        if billing is not None:
-            if request.method == 'POST':
-                billing.status = 3
-                billing.save()
-                form = BillingForm(request.POST)
-                if form.is_valid():
-                    form.save(user_id)
-                    response = redirect('user_details:account')
-                    return response
-            form = BillingForm(instance=billing)
-            return render(request, 'user_details/add_billing_address.html', {'form' : form})
+        try:
+            billing = UserBilling.objects.get(user_id=user_id, status=1)
 
-        elif request.method == 'POST':
+            if billing is not None:
+                if request.method == 'POST':
+                    billing.status = 3
+                    billing.save()
+                    form = BillingForm(request.POST)
+                    if form.is_valid():
+                        form.save(user_id)
+                        response = redirect('user_details:account')
+                        return response
+                form = BillingForm(instance=billing)
+                return render(request, 'user_details/add_billing_address.html', {'form' : form})
+        except:
+            print "No billing address"
+
+        if request.method == 'POST':
             form = BillingForm(request.POST)
             if form.is_valid():
                 print "Billing success"
@@ -145,7 +149,7 @@ def register(request):
 
 def delete_postal(request):
     if request.method == 'GET':
-        postal_id = request.GET.get('postalid', None)
+        postal_id = request.GET.get('postal_id', None)
         post_add = UserShipping.objects.get(id=postal_id)
         post_add.status = 3
         post_add.save();

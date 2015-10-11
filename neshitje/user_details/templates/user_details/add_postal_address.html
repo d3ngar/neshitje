@@ -64,7 +64,7 @@
             <td>{{ line.address_line_3 }}</td>
             <td>{{ line.city }}</td>
             <td>{{ line.post_code }}</td>
-            <td><a href="{% url 'user_details:del-postal' %}?postalid={{ line.id }}" title="delete">{{ line.post_code }}</a></td>
+            <td><a href="{% url 'user_details:del-postal' %}?postal_id={{ line.id }}" title="delete">{{ line.post_code }}</a></td>
           </tr>
       {% endfor %}
       </tbody>
