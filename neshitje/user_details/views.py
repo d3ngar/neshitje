@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.core.context_processors import csrf
-from .forms import UserRegForm, BillingForm, PostalForm, LoginForm
+from .forms import UserRegForm, BillingForm, PostalForm, LoginForm, ChangeEmailForm, ChangePasswordForm, ChangeNameForm
 from .models import UserBilling, UserShipping
 
 import main_app.recaptcha_simple
@@ -180,3 +180,83 @@ def simple_form(request):
 
     form = UserRegForm()
     return render(request, 'user_details/simple_form.html', {'form' : form})
+
+def edit_email(request):
+    if request.method == 'POST':
+        user_id = request.user
+        form = ChangeEmailForm(request.POST)
+        if form.is_valid():
+            password = request.POST.get('password', '')
+            email = request.POST.get('email', '')
+            user = auth.authenticate(username=user_id.username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                user.email = email
+                user.save()
+                response = redirect('user_details:account')
+                return response
+            else:
+                response = redirect('user_details:register')
+                return response
+        else:
+            return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
+    form = ChangeEmailForm()
+    return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
+
+def profile(request):
+    return render(request, 'user_details/profile.html', {})
+
+def edit_password(request):
+    if request.method == 'POST':
+        user_id = request.user
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            password = request.POST.get('old_password', '')
+            new_pass = request.POST.get('password1', '')
+            user = auth.authenticate(username=user_id.username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                user.set_password(new_pass)
+                user.save()
+                response = redirect('user_details:account')
+                return response
+            else:
+                response = redirect('user_details:register')
+                return response
+        else:
+            return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
+    form = ChangePasswordForm()
+    return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
+
+def reset_password(request):
+    return render(request, 'user_details/reset_password.html', {})
+
+def switch_marketing(request):
+    return render(request, 'user_details/edit_marketing.html', {})
+
+def edit_name(request):
+    if request.method == 'POST':
+        user_id = request.user
+        form = ChangeNameForm(request.POST)
+        if form.is_valid():
+            password = request.POST.get('password', '')
+            firstname = request.POST.get('firstname', '')
+            lastname = request.POST.get('lastname', '')
+            user = auth.authenticate(username=user_id.username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                user.first_name = firstname
+                user.last_name = lastname
+                user.save()
+                response = redirect('user_details:account')
+                return response
+            else:
+                response = redirect('user_details:register')
+                return response
+        else:
+            return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
+    form = ChangeNameForm()
+    return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
+
+def switch_account_status(request):
+    return render(request, 'user_details/edit_account.html', {})

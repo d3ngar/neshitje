@@ -1,0 +1,10 @@
+{% extends "user_details/profile.html" %}
+
+{% block profile_action %}
+<div class="panel panel-default" id="profile-panel-box">
+  <div class="panel-heading">Change your name</div>
+    <div class="panel-body">
+      {% include "main_app/save_form.html"%}
+    </div>
+</div>
+{% endblock profile_action %}

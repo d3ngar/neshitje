@@ -65,3 +65,29 @@ class PostalForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(label="username")
     password = forms.CharField(label="password", widget=forms.PasswordInput())
+
+
+class ChangeEmailForm(forms.Form):
+    email = forms.EmailField(label="Email", validators=[validate_email_unique])
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+class ChangePasswordForm(forms.Form):
+    password1 = forms.CharField(label="New password", widget=forms.PasswordInput())
+    password2 = forms.CharField(label="Confirm", widget=forms.PasswordInput())
+    old_password = forms.CharField(label="Old Password", widget=forms.PasswordInput())
+
+    def clean(self):
+        cleaned_data = super(ChangePasswordForm, self).clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+
+        if password2 and password1 and password2 != password1:
+            self._errors['password1'] = self.error_class(['Passwords do not match.'])
+            del self.cleaned_data['password1']
+            del self.cleaned_data['password2']
+        return cleaned_data
+
+class ChangeNameForm(forms.Form):
+    firstname = forms.CharField(label="Firstname")
+    lastname = forms.CharField(label="Lastname")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())

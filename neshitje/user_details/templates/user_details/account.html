@@ -9,7 +9,7 @@
           <div class="panel panel-default">
             <div class="panel-heading">Account Details</div>
             <div class="panel-body">
-              <a href="#" />Profile Settings</a><br />
+              <a href="{% url 'user_details:profile' %}" />Profile Settings</a><br />
               <a href="{% url 'user_details:add-billing' %}" />Billing Address</a><br />
               <a href="{% url 'user_details:add-postal' %}" />Postal Addresses</a><br />
               <a href="{% url 'user_details:logout' %}" title="Logout" />Logout</a><br />
@@ -53,7 +53,9 @@
         </div>
         <!-- CONTENT PANE -->
         <div class="col-sm-10">
-          <h1>{{ usr }} Account</h1>
+          {% block account_content %}
+          <h1>{{ user.get_username|capfirst }} Account</h1>
+          {% endblock account_content %}
         </div>
       </div>
   </div>

@@ -1,0 +1,22 @@
+{% load widget_tweaks %}
+{{ form.non_field_errors }}
+<form onsubmit="return validateForm()" action="{% url obj %}" class="form-horizontal" role="form" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-group">
+        {{ field.errors.as_text }}
+      <label class="control-label col-sm-3" for="{{ field.id_for_label }}"> {{ field.label }}: </label>
+      <div class="col-sm-8">
+        {% render_field field class+="form-control" %}
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="form-group">
+    <div class="col-sm-offset-3 col-sm-8">
+      <div class="left-right">
+        <button type="submit" class="btn btn-success" name="save" value="submit">Save</button>
+      </div>
+    </div>
+  </div>
+</form>

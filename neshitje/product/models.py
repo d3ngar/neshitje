@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from sorl.thumbnail import ImageField, get_thumbnail
+from main_app.models import Status
 
 #fs = FileSystemStorage(location='media/photos')
 # Create your models here.
@@ -41,7 +42,7 @@ class Product(models.Model):
     supplier_id = models.CharField(max_length=75, null=True, blank=True)
     product_description = models.TextField()
     price = models.DecimalField (max_digits=20, decimal_places=4, default=Decimal('0.0000'))
-    status = models.IntegerField(default=1)
+    status = models.ForeignKey(Status, default=1)
     in_stock = models.IntegerField(default=1)
     user = models.ForeignKey(User)
     keywords = models.CharField(max_length=4000, null=True, blank=True)
@@ -56,7 +57,7 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product)
     user = models.ForeignKey(User)
-    status = models.IntegerField(default=1)
+    status = models.ForeignKey(Status, default=1)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
     status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)
     image = models.ImageField(upload_to=where_to_upload)

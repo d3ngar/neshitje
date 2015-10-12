@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from main_app.models import Status
 
 
 # Create your models here.
@@ -11,7 +12,7 @@ class SourceID(models.Model):
     http_ref = models.CharField(max_length=80, blank=True, null=True)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
     status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)
-    status = models.IntegerField(default=1)
+    status = models.ForeignKey(Status, default=1)
 
     def __str__(self):
         return self.source_name

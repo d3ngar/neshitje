@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('main_app', '0001_initial'),
     ]
 
     operations = [
@@ -44,13 +45,13 @@ class Migration(migrations.Migration):
                 ('supplier_id', models.CharField(max_length=75, null=True, blank=True)),
                 ('product_description', models.TextField()),
                 ('price', models.DecimalField(default=Decimal('0.0000'), max_digits=20, decimal_places=4)),
-                ('status', models.IntegerField(default=1)),
                 ('in_stock', models.IntegerField(default=1)),
                 ('keywords', models.CharField(max_length=4000, null=True, blank=True)),
                 ('date_added', models.DateTimeField(auto_now_add=True, verbose_name=b'Date Created', null=True)),
                 ('status_changed', models.DateTimeField(auto_now=True, verbose_name=b'Date Created', null=True)),
                 ('condition', models.ForeignKey(to='product.Condition')),
                 ('currency_code', models.ForeignKey(to='product.Currency')),
+                ('status', models.ForeignKey(default=1, to='main_app.Status')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -61,11 +62,11 @@ class Migration(migrations.Migration):
             name='ProductImage',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.IntegerField(default=1)),
                 ('date_added', models.DateTimeField(auto_now_add=True, verbose_name=b'Date Created', null=True)),
                 ('status_changed', models.DateTimeField(auto_now=True, verbose_name=b'Date Created', null=True)),
                 ('image', models.ImageField(upload_to=product.models.where_to_upload)),
                 ('product', models.ForeignKey(to='product.Product')),
+                ('status', models.ForeignKey(default=1, to='main_app.Status')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
