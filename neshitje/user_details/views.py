@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.core.context_processors import csrf
-from .forms import UserRegForm, BillingForm, PostalForm, LoginForm, ChangeEmailForm, ChangePasswordForm, ChangeNameForm
+from .forms import UserRegForm, BillingForm, PostalForm, LoginForm, ChangeEmailForm, ChangePasswordForm, ChangeNameForm, CloseAccountForm, ChangeEmailOptinForm, ChangePhoneForm
 from .models import UserBilling, UserShipping
 
 import main_app.recaptcha_simple
@@ -41,9 +41,10 @@ def add_billing(request):
 
                 if request.POST.get('save') == 'submit':
                     response = redirect('user_details:account')
+                    return response
                 elif request.POST.get('add_shipping') == 'submit':
                     response = redirect('user_details:add-shipping')
-                return response
+                    return response
 
             return render(request, 'user_details/add_billing_address.html', {'form' : form})
         else:
@@ -117,6 +118,14 @@ def login_process(request):
 
 
 def logout_process(request):
+    if request.session.get('delete'):
+        delete = request.session.get('delete')
+        user = request.user
+        if user.id == delete:
+            user.is_active = False
+            user.userdetail.status_id = 3
+            user.userdetail.save()
+            user.save()
     auth.logout(request)
     return redirect('main_app:homepage')
 
@@ -167,7 +176,7 @@ def account(request):
 
 
 ## This one is mainly to try around in.
-def simple_form(request):
+def edit_phone(request):
     if request.method == 'POST':
         form = UserRegForm(request.POST)
         if form.is_valid():
@@ -232,7 +241,17 @@ def reset_password(request):
     return render(request, 'user_details/reset_password.html', {})
 
 def switch_marketing(request):
-    return render(request, 'user_details/edit_marketing.html', {})
+    if request.user.is_authenticated():
+        if request.method == 'POST':
+            optin = request.POST.get('optin', '')
+            request.user.userdetail.marketing_optin = optin
+            request.user.userdetail.save()
+
+        optin = request.user.userdetail.marketing_optin
+        form = ChangeEmailOptinForm()
+        return render(request, 'user_details/edit_marketing.html', {'form':form, 'optin':optin})
+    else:
+        return redirect('user_details:logging')
 
 def edit_name(request):
     if request.method == 'POST':
@@ -259,4 +278,42 @@ def edit_name(request):
     return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
 
 def switch_account_status(request):
-    return render(request, 'user_details/edit_account.html', {})
+    if request.user.is_authenticated():
+        user_id = request.user
+        form = CloseAccountForm()
+        if request.method == 'POST':
+            form = CloseAccountForm(request.POST)
+            if form.is_valid:
+                username = request.POST.get('username', '')
+                password = request.POST.get('password', '')
+                user = auth.authenticate(username=username, password=password)
+
+                if user is not None and user == user_id:
+                    request.session['delete'] = user_id.id
+                    response = redirect('user_details:logout')
+                    return response
+                else:
+                    response = redirect('user_details:register')
+                    return response
+
+        return render(request, 'user_details/edit_account.html', {'form':form, 'user':user_id})
+
+    else:
+        return redirect('user_details:logging')
+
+def edit_phone(request):
+    if request.method == 'POST':
+        user_id = request.user
+        form = ChangePhoneForm(request.POST)
+        if form.is_valid():
+            phone = request.POST.get('phone', '')
+            user_id.userdetail.phone_number = phone
+            print user_id.userdetail.phone_number
+            user_id.userdetail.save()
+            response = redirect('user_details:account')
+            return response
+        else:
+            return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})
+    else:
+        form = ChangePhoneForm()
+        return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})

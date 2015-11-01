@@ -1,5 +1,35 @@
 {% extends "user_details/profile.html" %}
-
+{% load widget_tweaks %}
 {% block profile_action %}
-<h3>Modify account status</h3>
+<div class="panel panel-default" id="profile-panel-box">
+  <div class="panel-heading">Close your account</div>
+    <div class="panel-body">
+      <p>
+        To cancel your account, stopping all your ads, emails and open transactions enter your username and password below. We will not contact you other than to prevent fraud or to in case if a court orders us to do so.
+      </p>
+
+      {{ form.non_field_errors }}
+      <form name="close-account" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'user_details:status-switch' %}">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-group">
+              {{ field.errors.as_text }}
+            <label class="control-label col-sm-3" for="{{ field.id_for_label }}"> {{ field.label }}: </label>
+            <div class="col-sm-8">
+              {% render_field field class+="form-control" %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-9" style="padding-right:50px">
+            <button id="save-button" type="submit" class="btn btn-block btn-danger" name="delete"  value="save">Close your account</button>
+          </div>
+        </div>
+      </form>
+
+        This does not delete all of your accounts data. To exercise your right to be forgotten and disassociate yourself from Ne Shitje, please <a title="" href="{% url 'main_app:contact' %}">contact us</a> through customer service.
+      </p>
+    </div>
+</div>
 {% endblock profile_action %}

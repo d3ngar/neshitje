@@ -100,11 +100,21 @@ USE_TZ = True
 
 # Setting up all sorts of email things:
 # For email
+"""
 EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 EMAIL_HOST = Secrets.email_host
 EMAIL_PORT = 465
 EMAIL_USERNAME = Secrets.email_username
 EMAIL_PASSWORD = Secrets.email_password
+"""
+
+## For debugging, but you will also need to run python -m smtpd -n -c DebuggingServer localhost:1025
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 
 # Static files (CSS, JavaScript, Images)

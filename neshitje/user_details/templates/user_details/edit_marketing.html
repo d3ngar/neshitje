@@ -1,5 +1,33 @@
 {% extends "user_details/profile.html" %}
+{% load widget_tweaks %}
 
 {% block profile_action %}
-<h3>Edit marketing preferences</h3>
+<div class="panel panel-default" id="profile-panel-box">
+  <div class="panel-heading">Edit your marketing preferences</div>
+    <div class="panel-body">
+      <p>
+        Stop receiving marketing emails. This includes wishlist and updates about listings. You will still receive emails that are important to your account and to compliance with our terms and conditions.
+      </p>
+
+      {{ form.non_field_errors }}
+      <form name="marketing-form" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'user_details:edit-marketing' %}">
+        {% csrf_token %}
+          <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-2" style="text-align: right; padding-top: 7px;">
+              {% if optin %}
+                {% render_field form.optin|attr:"checked" %}
+              {% else %}
+                {% render_field form.optin %}
+              {% endif %}
+            </div>
+            <label class="control-label col-sm-5" for="email-opt-in"> Ticked to receive marketing emails.</label>
+          </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-9" style="padding-right:50px">
+            <button type="submit" class="btn btn-block btn-primary" name="delete"  value="save">Update email preferences</button>
+          </div>
+        </div>
+      </form>
+    </div>
+</div>
 {% endblock profile_action %}

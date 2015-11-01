@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
-from .models import Product
+from .models import Product, ProductImage
 from .forms import ProductMainForm, ProductImageForm
 
 def product(request):
@@ -47,14 +47,18 @@ def image_upload(request):
         user_id = request.user
 
         if request.method == 'POST':
-            form = ProductImageForm(request.POST, request.FILES)
-            if form.is_valid():
-                print "image upload successful"
-                form.save(request.POST.get('product'), user_id)
-                return redirect('user_details:account')
+            #form = ProductImageForm(request.POST, request.FILES)
+            #if form.is_valid():
+            image = request.FILES['image']
+            prod = Product.objects.get(id=1)
+            pi = ProductImage(product=prod, user=user_id, image=image)
+            pi.save()
+            print "image upload successful"
+            #form.save(request.POST.get('product'))
+            return redirect('user_details:account')
 
         form = ProductImageForm()
-        return render (request, 'product/add-image.html', {'form':form, 'prod_id':2})
+        return render (request, 'product/add-image.html', {'form':form, 'prod_id':Product.objects.get(id=1)})
 
     else:
         response = redirect('user_details:logging')

@@ -18,7 +18,7 @@ def where_to_upload(instance, filename):
     product = instance.product.id
     user = instance.user.id
     filename = 'product_images/' + str(user)  + "/" + str(product) + "/" + hashlib.md5(filename).hexdigest()+'.jpg'
-    #print "Created a unique filename: " + filename
+    print "Created a unique filename: " + filename
     return filename
 
 
@@ -56,8 +56,8 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product)
+    status = models.ForeignKey(Status, default=lambda: Status.objects.get(id=1))
     user = models.ForeignKey(User)
-    status = models.ForeignKey(Status, default=1)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
     status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)
     image = models.ImageField(upload_to=where_to_upload)

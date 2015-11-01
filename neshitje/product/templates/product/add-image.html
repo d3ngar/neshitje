@@ -7,7 +7,7 @@
   {{ form.non_field_errors }}
   <form name="add-image" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'product:image-upload' %}" enctype="multipart/form-data">
     {% csrf_token %}
-    {% render_field form.product value=prod_id %}
+    {#% render_field form.product value=prod_id %#}
     <div class="form-group">
       {{ form.image.errors.as_text }}
       <label class="control-label col-sm-2" for="{{ form.image.id_for_label }}"> {{ form.image.label }}*: </label>

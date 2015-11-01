@@ -8,7 +8,6 @@ urlpatterns = [
     url(r'^add-postal-address', views.add_postal, name='add-postal'),
     url(r'^postal-done', views.postal_done, name='postal-done'),
     url(r'^my-account', views.account, name='account'),
-    url(r'^simple-form', views.simple_form, name='simple-form'),
     url(r'^login', views.login_process, name='login'),
     url(r'^logout', views.logout_process, name='logout'),
     url(r'^logging', views.logging, name='logging'),
@@ -16,8 +15,13 @@ urlpatterns = [
     url(r'^edit-email', views.edit_email, name='edit-email'),
     url(r'^edit-password', views.edit_password, name='edit-password'),
     url(r'^profile', views.profile, name='profile'),
-    url(r'^reset-password', views.reset_password, name='reset-password'),
     url(r'^edit-marketing', views.switch_marketing, name='edit-marketing'),
     url(r'^edit-name', views.edit_name, name='edit-name'),
     url(r'^edit-account-status', views.switch_account_status, name='status-switch'),
+    url(r'^edit-phone', views.edit_phone, name='edit-phone'),
+    # for password reset
+    url(r'^reset-password$','django.contrib.auth.views.password_reset', {'post_reset_redirect' : 'user_details:password_reset_done', 'template_name': 'user_details/reset_password.html', 'email_template_name':'user_details/pwd_reset_email.html'}, name="password_reset"),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z]+)/(?P<token>.+$)', 'django.contrib.auth.views.password_reset_confirm', {'post_reset_redirect' : 'user_details:password_reset_complete', 'template_name' : 'user_details/pwd_reset_new.html'}, name='password_reset_confirm'),
+    url(r'^reset-done', 'django.contrib.auth.views.password_reset_done', {'template_name' : 'user_details/pwd_reset_done.html'}, name='password_reset_done'),
+    url(r'^pwd-reset-complete', 'django.contrib.auth.views.password_reset_done', {'template_name' : 'user_details/pwd_reset_new_done.html'}, name='password_reset_complete'),
 ]

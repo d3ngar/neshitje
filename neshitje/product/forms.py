@@ -18,7 +18,7 @@ class ProductMainForm(forms.ModelForm):
 
 
 class ProductImageForm(forms.ModelForm):
-    product = forms.IntegerField(widget=forms.HiddenInput())
+    #product = forms.IntegerField(widget=forms.HiddenInput())
     class Meta:
         model = ProductImage
         fields = ('image',)

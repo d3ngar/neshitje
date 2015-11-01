@@ -5,20 +5,11 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import UserDetail, UserBilling, UserShipping
 from .validators import validate_email_unique
 
-"""
-class RegisterBaseForm(forms.Form):
-    first_name = forms.CharField(label="Firstname")
-    last_name =  forms.CharField(label="Lastname")
-    user_name =  forms.CharField(label="Username")
-    email = forms.CharField(label="Email")
-    password = forms.CharField(widget=forms.PasswordInput())
-    confirm_password = forms.CharField(widget=forms.PasswordInput())
-"""
-
 class UserRegForm(UserCreationForm):
     first_name = forms.CharField(label="Firstname")
     last_name =  forms.CharField(label="Lastname")
     email = forms.CharField(label="Email", validators=[validate_email_unique])
+    phone =  forms.RegexField(regex=r'^\+?\d{6,15}$', error_message = ("Phone number must be entered. Can start '+', but can have no spaces. Six required and up to 15 digits allowed."))
 
     class Meta:
         model = User
@@ -33,6 +24,7 @@ class UserRegForm(UserCreationForm):
         if commit:
             user.save()
             detail = UserDetail(user_id=user.id)
+            detail.phone_number = self.cleaned_data['phone']
             detail.save()
 
         return user
@@ -91,3 +83,13 @@ class ChangeNameForm(forms.Form):
     firstname = forms.CharField(label="Firstname")
     lastname = forms.CharField(label="Lastname")
     password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+class CloseAccountForm(forms.Form):
+    username = forms.CharField(label="Username")
+    password = forms.CharField(label="Password", widget=forms.PasswordInput())
+
+class ChangeEmailOptinForm(forms.Form):
+    optin = forms.BooleanField()
+
+class ChangePhoneForm(forms.Form):
+    phone =  forms.RegexField(regex=r'^\+?\d{6,15}$', error_message = ("Phone number must be entered. Can start '+', but can have no spaces. Six required and up to 15 digits allowed."))

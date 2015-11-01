@@ -1,6 +1,6 @@
-{% extends "main_app/base.html" %}
+{% extends "user_details/account.html" %}
 {% load widget_tweaks %}
-{% block content %}
+{% block account_content %}
 
 <script type="text/javascript">
   function ValidateAccount() {
@@ -36,8 +36,8 @@
 </script>
 
 
+<h1>Postal Addresses</h1>
 <div class="container-fluid">
-  <h1>Postal Addresses</h1>
 </div>
 
 {% if postals %}
@@ -95,7 +95,7 @@
     </div>
   </form>
 </div>
-{% endblock content %}
+{% endblock account_content %}
 
 {% block footer %}
 {% endblock footer %}

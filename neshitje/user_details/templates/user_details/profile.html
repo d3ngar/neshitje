@@ -20,23 +20,27 @@
       </p>
       <p>
         <div class="left-right"><span>Full name:</span></div>
-        <div class="text-right"><span>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-name' %}"><span class="small-text" >(edit)</span></a></div>
+        <div class="text-right"><span>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-name' %}#save-button"><span class="small-text" >(edit)</span></a></div>
       </p>
       <p>
         <div class="left-right"><span>Email:</span></div>
-        <div class="text-right"><span>{{ user.email }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-email' %}"><span class="small-text" >(edit)</span></a></div>
+        <div class="text-right"><span>{{ user.email }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-email' %}#save-button"><span class="small-text" >(edit)</span></a></div>
+      </p>
+      <p>
+        <div class="left-right"><span>Phone Number:</span></div>
+        <div class="text-right"><span>{{ user.userdetail.phone_number }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-phone' %}#save-button"><span class="small-text" >(edit)</span></a></div>
       </p>
       <p>
         <div class="left-right"><span>Password:</span></div>
-        <div class="text-right"><span>**********</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-password' %}"><span class="small-text" >(edit)</span></a></div>
+        <div class="text-right"><span>**********</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-password' %}#save-button"><span class="small-text" >(edit)</span></a></div>
       </p>
       <p>
         <div class="left-right"><span>Receive marketing emails:</span></div>
-        <div class="text-right"><span>{{ user.userdetail.marketing_optin|yesno:"yes,no" }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-marketing' %}"><span class="small-text" >(edit)</span></a></div>
+        <div class="text-right"><span>{{ user.userdetail.marketing_optin|yesno:"yes,no" }}</span>&nbsp;<a title="edit" href="{% url 'user_details:edit-marketing' %}#save-button"><span class="small-text" >(edit)</span></a></div>
       </p>
       <p>
         <div class="left-right"><span>Account is active:</span></div>
-        <div class="text-right"><span>{{ user.userdetail.marketing_optin|yesno:"yes,no" }}</span>&nbsp;<a title="edit" href="{% url 'user_details:status-switch' %}"><span class="small-text" >(edit)</span></a></div>
+        <div class="text-right"><span>{{ user.is_active|yesno:"yes,no" }}</span>&nbsp;<a title="edit" href="{% url 'user_details:status-switch' %}#save-button"><span class="small-text" >(edit)</span></a></div>
       </p>
     </div>
   </div>

@@ -1,6 +1,6 @@
-{% extends "main_app/base.html" %}
+{% extends "user_details/account.html" %}
 {% load widget_tweaks %}
-{% block content %}
+{% block account_content %}
 
 <script type="text/javascript">
   function validateForm() {
@@ -29,9 +29,8 @@
   }
 </script>
 
-
+<h1>Your billing address</h1>
 <div class="container">
-  <h1>Your billing address</h1>
   <form name="billing_form" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'user_details:add-billing' %}">
     {% csrf_token %}
 
@@ -52,7 +51,7 @@
     </div>
   </form>
 </div>
-{% endblock content %}
+{% endblock account_content %}
 
 {% block footer %}
 {% endblock footer %}
