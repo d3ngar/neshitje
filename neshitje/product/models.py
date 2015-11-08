@@ -56,7 +56,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product)
-    status = models.ForeignKey(Status, default=lambda: Status.objects.get(id=1))
+    status = models.ForeignKey(Status, default=1)
     user = models.ForeignKey(User)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
     status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)

@@ -129,3 +129,6 @@ MEDIA_ROOT = '/home/dengar/Documents/development/neshitje/neshitje/media/uploads
 # recaptcha
 RECAPTCHA_PUBLIC_KEY = Secrets.captcha_site_key
 RECAPTCHA_PRIVATE_KEY = Secrets.captcha_secret_key
+
+# close sessions at browser exit
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
