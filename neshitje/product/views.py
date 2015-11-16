@@ -33,6 +33,7 @@ def edit_product(request):
             return render(request, 'product/edit-product.html', {'form':form})
 
     else:
+        request.session['direct_url'] = 'product:edit-product'
         response = redirect('user_details:logging')
         return response
 
@@ -61,5 +62,6 @@ def image_upload(request):
         return render (request, 'product/add-image.html', {'form':form, 'prod_id':Product.objects.get(id=1)})
 
     else:
+        request.session['direct_url'] = 'product:image-upload'
         response = redirect('user_details:logging')
         return response

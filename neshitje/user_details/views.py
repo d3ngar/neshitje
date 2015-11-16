@@ -61,6 +61,7 @@ def add_billing(request):
             return render(request, 'user_details/add_billing_address.html', {'form': form})
 
     else:
+        request.session['direct_url'] = 'user_details:add-billing'
         response = redirect('user_details:logging')
         return response
 
@@ -85,11 +86,19 @@ def add_postal(request):
             return render(request, 'user_details/add_postal_address.html', {'form': form, 'postals':postals})
 
     else:
+        request.session['direct_url'] = 'user_details:add-postal'
         response = redirect('user_details:logging')
         return response
 
 
 def logging(request):
+
+    if not request.session.get('direct_url', False):
+        messages.warning(request, "We are sorry, we forgot where you want to go, so we sent you here.")
+        url = "user_details:register"
+    else:
+        url = request.session.get('direct_url')
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid:
@@ -100,12 +109,15 @@ def logging(request):
 
             if user is not None:
                 auth.login(request, user)
-                response = redirect('user_details:account')
+                messages.success(request, "Thank you for logging in")
+                response = redirect(url)
                 return response
             else:
-                response = redirect('user_details:register')
+                messages.warning(request, "There was an error logging you in.")
+                response = redirect('user_details:logging')
                 return response
         else:
+            messages.warning(request, "There was an error trying to log you in")
             return render(request, 'user_details/logging.html', {'form': form})
     else:
         form = LoginForm()
@@ -113,6 +125,13 @@ def logging(request):
 
 
 def login_process(request):
+
+    referrer = None
+    try:
+        referrer = request.META['HTTP_REFERER']
+    except KeyError:
+        referrer = "user_details:register"
+
     username = request.POST.get('username', '')
     password = request.POST.get('password', '')
 
@@ -120,14 +139,23 @@ def login_process(request):
 
     if user is not None:
         auth.login(request, user)
-        response = redirect('user_details:account')
+        messages.success(request, "Hello " + user.first_name + ", you are now logged in.")
+        response = redirect(referrer)
         return response
     else:
-        response = redirect('user_details:register')
+        response = redirect(referrer)
+        messages.error(request, "User not found!")
         return response
 
 
 def logout_process(request):
+
+    referrer = None
+    try:
+        referrer = request.META['HTTP_REFERER']
+    except KeyError:
+        referrer = 'main_app:homepage'
+
     if request.session.get('delete'):
         delete = request.session.get('delete')
         user = request.user
@@ -136,10 +164,10 @@ def logout_process(request):
             user.userdetail.status_id = 3
             user.userdetail.save()
             user.save()
-            messages.success(request, "Your account eas successfully deactivated.")
+            messages.success(request, "Your account was successfully deactivated.")
     auth.logout(request)
     messages.success(request, "Logged out!")
-    return redirect('main_app:homepage')
+    return redirect(referrer)
 
 
 def register(request):
@@ -170,88 +198,120 @@ def register(request):
     return render(request, 'user_details/register_base.html', {'form' : form})
 
 def delete_postal(request):
-    if request.method == 'GET':
-        postal_id = request.GET.get('postal_id', None)
-        post_add = UserShipping.objects.get(id=postal_id)
-        post_add.status = 3
-        post_add.save();
-        messages.success(request, "Postal address deleted!")
-    return render(request, 'user_details/account.html', {})
-
+    if request.user.is_authenticated():
+        if request.method == 'GET':
+            postal_id = request.GET.get('postal_id', None)
+            post_add = UserShipping.objects.get(id=postal_id)
+            post_add.status = 3
+            post_add.save();
+            messages.success(request, "Postal address deleted!")
+        return render(request, 'user_details/account.html', {})
+    else:
+        request.session['direct_url'] = 'user_details:del-postal'
+        response = redirect('user_details:logging')
+        return response
 
 def account(request):
-    return render(request, 'user_details/account.html', {})
-
+    if request.user.is_authenticated():
+        return render(request, 'user_details/account.html', {})
+    else:
+        request.session['direct_url'] = 'user_details:account'
+        response = redirect('user_details:logging')
+        return response
 
 
 ## This one is mainly to try around in.
 def edit_phone(request):
-    if request.method == 'POST':
-        form = UserRegForm(request.POST)
-        if form.is_valid():
-            print "User reg form success"
-            form.save()
-            messages.success(request, "Phone number updated.")
-            response = redirect('user_details:account')
-            return response
-        else:
-            messages.warning(request, "Phone number not updated.")
-            return render(request, 'user_details/edit_phone.html', {'form' : form})
+    if request.user.is_authenticated():
 
-    return render(request, 'user_details/edit_phone.html', {'form' : form})
+        if request.method == 'POST':
+            form = UserRegForm(request.POST)
+            if form.is_valid():
+                print "User reg form success"
+                form.save()
+                messages.success(request, "Phone number updated.")
+                response = redirect('user_details:account')
+                return response
+            else:
+                messages.warning(request, "Phone number not updated.")
+                return render(request, 'user_details/edit_phone.html', {'form' : form})
+        return render(request, 'user_details/edit_phone.html', {'form' : form})
+
+    else:
+        request.session['direct_url'] = 'user_details:edit-phone'
+        response = redirect('user_details:logging')
+        return response
 
 def edit_email(request):
-    if request.method == 'POST':
-        user_id = request.user
-        form = ChangeEmailForm(request.POST)
-        if form.is_valid():
-            password = request.POST.get('password', '')
-            email = request.POST.get('email', '')
-            user = auth.authenticate(username=user_id.username, password=password)
-            if user is not None:
-                auth.login(request, user)
-                user.email = email
-                user.save()
-                messages.success(request, "Email address updated")
-                response = redirect('user_details:account')
-                return response
+    if request.user.is_authenticated():
+        if request.method == 'POST':
+            user_id = request.user
+            form = ChangeEmailForm(request.POST)
+            if form.is_valid():
+                password = request.POST.get('password', '')
+                email = request.POST.get('email', '')
+                user = auth.authenticate(username=user_id.username, password=password)
+                if user is not None:
+                    auth.login(request, user)
+                    user.email = email
+                    user.save()
+                    messages.success(request, "Email address updated")
+                    response = redirect('user_details:account')
+                    return response
+                else:
+                    messages.warning(request, "Email address not updated")
+                    response = redirect('user_details:edit-email')
+                    return response
             else:
                 messages.warning(request, "Email address not updated")
-                response = redirect('user_details:edit-email')
-                return response
-        else:
-            messages.warning(request, "Email address not updated")
-            return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
-    form = ChangeEmailForm()
-    return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
+                return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
+        form = ChangeEmailForm()
+        return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
+
+    else:
+        request.session['direct_url'] = 'user_details:edit-email'
+        response = redirect('user_details:logging')
+        return response
 
 def profile(request):
-    return render(request, 'user_details/profile.html', {})
+    if request.user.is_authenticated():
+        return render(request, 'user_details/profile.html', {})
+    else:
+        request.session['direct_url'] = 'user_details:profile'
+        response = redirect('user_details:logging')
+        return response
 
 def edit_password(request):
-    if request.method == 'POST':
-        user_id = request.user
-        form = ChangePasswordForm(request.POST)
-        if form.is_valid():
-            password = request.POST.get('old_password', '')
-            new_pass = request.POST.get('password1', '')
-            user = auth.authenticate(username=user_id.username, password=password)
-            if user is not None:
-                auth.login(request, user)
-                user.set_password(new_pass)
-                user.save()
-                messages.success(request, "Your password has been updated")
-                response = redirect('user_details:account')
-                return response
+    if request.user.is_authenticated():
+
+        if request.method == 'POST':
+            user_id = request.user
+            form = ChangePasswordForm(request.POST)
+            if form.is_valid():
+                password = request.POST.get('old_password', '')
+                new_pass = request.POST.get('password1', '')
+                user = auth.authenticate(username=user_id.username, password=password)
+                if user is not None:
+                    auth.login(request, user)
+                    user.set_password(new_pass)
+                    user.save()
+                    messages.success(request, "Your password has been updated")
+                    response = redirect('user_details:account')
+                    return response
+                else:
+                    messages.warning(request, "Your password was not updated")
+                    response = redirect('user_details:edit-password')
+                    return response
             else:
                 messages.warning(request, "Your password was not updated")
-                response = redirect('user_details:edit-password')
-                return response
-        else:
-            messages.warning(request, "Your password was not updated")
-            return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
-    form = ChangePasswordForm()
-    return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
+                return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
+        form = ChangePasswordForm()
+        return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
+
+    else:
+        request.session['direct_url'] = 'user_details:edit-password'
+        response = redirect('user_details:logging')
+        return response
 
 def reset_password(request):
     return render(request, 'user_details/reset_password.html', {})
@@ -267,34 +327,42 @@ def switch_marketing(request):
         form = ChangeEmailOptinForm()
         return render(request, 'user_details/edit_marketing.html', {'form':form, 'optin':optin})
     else:
+        request.session['direct_url'] = 'user_details:edit-marketing'
         return redirect('user_details:logging')
 
 def edit_name(request):
-    if request.method == 'POST':
-        user_id = request.user
-        form = ChangeNameForm(request.POST)
-        if form.is_valid():
-            password = request.POST.get('password', '')
-            firstname = request.POST.get('firstname', '')
-            lastname = request.POST.get('lastname', '')
-            user = auth.authenticate(username=user_id.username, password=password)
-            if user is not None:
-                auth.login(request, user)
-                user.first_name = firstname
-                user.last_name = lastname
-                user.save()
-                messages.success(request, "Your name has been updated successfully")
-                response = redirect('user_details:account')
-                return response
+    if request.user.is_authenticated():
+
+        if request.method == 'POST':
+            user_id = request.user
+            form = ChangeNameForm(request.POST)
+            if form.is_valid():
+                password = request.POST.get('password', '')
+                firstname = request.POST.get('firstname', '')
+                lastname = request.POST.get('lastname', '')
+                user = auth.authenticate(username=user_id.username, password=password)
+                if user is not None:
+                    auth.login(request, user)
+                    user.first_name = firstname
+                    user.last_name = lastname
+                    user.save()
+                    messages.success(request, "Your name has been updated successfully")
+                    response = redirect('user_details:account')
+                    return response
+                else:
+                    messages.warning(request, "Your name couldn't be updated")
+                    response = redirect('user_details:register')
+                    return response
             else:
                 messages.warning(request, "Your name couldn't be updated")
-                response = redirect('user_details:register')
-                return response
-        else:
-            messages.warning(request, "Your name couldn't be updated")
-            return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
-    form = ChangeNameForm()
-    return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
+                return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
+        form = ChangeNameForm()
+        return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
+
+    else:
+        request.session['direct_url'] = 'user_details:edit-name'
+        response = redirect('user_details:logging')
+        return response
 
 def switch_account_status(request):
     if request.user.is_authenticated():
@@ -318,23 +386,31 @@ def switch_account_status(request):
         return render(request, 'user_details/edit_account.html', {'form':form, 'user':user_id})
 
     else:
+        request.session['direct_url'] = 'user_details:status-switch'
         return redirect('user_details:logging')
 
 def edit_phone(request):
-    if request.method == 'POST':
-        user_id = request.user
-        form = ChangePhoneForm(request.POST)
-        if form.is_valid():
-            phone = request.POST.get('phone', '')
-            user_id.userdetail.phone_number = phone
-            print user_id.userdetail.phone_number
-            user_id.userdetail.save()
-            messages.success(request, "Your phone number has been udpated.")
-            response = redirect('user_details:account')
-            return response
+    if request.user.is_authenticated:
+
+        if request.method == 'POST':
+            user_id = request.user
+            form = ChangePhoneForm(request.POST)
+            if form.is_valid():
+                phone = request.POST.get('phone', '')
+                user_id.userdetail.phone_number = phone
+                print user_id.userdetail.phone_number
+                user_id.userdetail.save()
+                messages.success(request, "Your phone number has been udpated.")
+                response = redirect('user_details:account')
+                return response
+            else:
+                messages.warning(request, "Your phone number could not be updated.")
+                return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})
         else:
-            messages.warning(request, "Your phone number could not be updated.")
+            form = ChangePhoneForm()
             return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})
+
     else:
-        form = ChangePhoneForm()
-        return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})
+        request.session['direct_url'] = 'user_details:edit-phone'
+        response = redirect('user_details:logging')
+        return response
