@@ -45,7 +45,7 @@ class UserSessionTracking(object):
         ## Get things
         source_id = self.get_source_id(request)
 
-        print("starting a new session")
+        print "starting a new session"
 
         geoip = self.getGeoIPJSON(ip)
         if geoip.get("type") == "error":
@@ -73,7 +73,7 @@ class UserSessionTracking(object):
                     bot = True
                     return bot
         except:
-            print("Bot checker: no ip")
+            print "Bot checker: no ip"
 
         try:
             cli_ref = request.META['HTTP_USER_AGENT']
@@ -83,7 +83,7 @@ class UserSessionTracking(object):
                     bot = True
                     return bot
         except KeyError:
-            print("Bot checker: no user agent")
+            print "Bot checker: no user agent"
 
         return bot
 
@@ -144,7 +144,7 @@ class UserSessionTracking(object):
 
     def getGeoIPJSON(self, ip):
         url = "http://geoip.nekudo.com/api/" + ip + "/en/short"
-        print("Getting the GEO IP for: " + url)
+        print "Getting the GEO IP for: " + url
         f = urllib2.urlopen(url).read()
         json_data = json.loads(f)
         return json_data
@@ -170,7 +170,7 @@ class UserSessionTracking(object):
                 cookie_id = CookieTracker.objects.get(pk=cid)
 
                 if not request.session.get('session_id', False):
-                    print("starting a new session")
+                    print "starting a new session"
                     self.set_session(request, cookie_id)
                     request.session['page_views'] = page_views
 
@@ -180,9 +180,9 @@ class UserSessionTracking(object):
                 cookie.save()
                 response.set_signed_cookie('cookie_id', cookie.id, salt=Secrets.salt, max_age=5184000)
                 response.set_signed_cookie('last_visit', datetime.strftime(timezone.now(), "%Y-%m-%d %H:%M:%S"), salt=Secrets.salt, max_age=5184000)
-                print("Visitor isn't recognised, setting cookie: " + str(cookie.id))
+                print "Visitor isn't recognised, setting cookie: " + str(cookie.id)
 
-                print("starting a new session")
+                print "starting a new session"
                 self.set_session(request, cookie)
                 request.session['page_views'] = page_views
 
@@ -209,4 +209,4 @@ class UserSessionTracking(object):
 
 
         else:
-            print("The session was identified to be a bot")
+            print "The session was identified to be a bot"
