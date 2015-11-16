@@ -115,6 +115,10 @@ label {
   margin-top: 10px;
 }
 
+.alert {
+  text-align: center;
+}
+
 .search-results-bar {
   background-color: #7AC5C2;
   width: 100%;
@@ -145,6 +149,8 @@ label {
 .small-text {
   font-size: 0.8em;
 }
+
+.modal-backdrop.in { z-index: auto;}
 
 @media screen and (min-width: 992px) {
   #logo-header {

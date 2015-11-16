@@ -15,6 +15,9 @@
   <script src='https://www.google.com/recaptcha/api.js'></script>
   <!-- Script for EU cookie directove -->
   <script src="{% static "js/jquery.cookiesdirective.js" %}"> </script>
+  <!-- own JavaSctipt library -->
+  <script src="{% static "js/neshitje.js" %}"> </script>
+
 
   <link rel="stylesheet" href="{% static "css/styles.css" %}" />
 
@@ -29,10 +32,32 @@
   {% include "main_app/tagmanager.html" %}
 
   {% block navigation %}
-      {% include "main_app/top_navigation.html" %}
+    <nav class="navbar navbar-fixed-top navbar-default">
+
+    {% include "main_app/top_navigation.html" %}
+    {% block subnav %}
+    {% endblock %}
+
+    </nav>
+    {% block extrapadding %}
+    {% endblock %}
+
   {% endblock %}
 
-
+  {% block messages %}
+    {% if messages %}
+      <div class="container-fluid" id="alert-message">
+        <div class="col-sm-6 col-sm-offset-3">
+          {% for message in messages %}
+            {% if message.tags == "success" %} <p class="alert alert-success"> {{ message }}</p> {% endif %}
+            {% if message.tags == "info" %} <p class="alert alert-info"> {{ message }}</p> {% endif %}
+            {% if message.tags == "warning" %} <p class="alert alert-warning"> {{ message }}</p> {% endif %}
+            {% if message.tags == "danger" %} <p class="alert alert-danger"> {{ message }}</p> {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endblock %}
 
   <!-- This part should really be removed -->
   <div style="min-height: 520px;">

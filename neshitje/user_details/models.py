@@ -32,7 +32,7 @@ class UserBilling(models.Model):
     status = models.ForeignKey(Status, default=1)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.address_line_1)
 
 
 class UserShipping(models.Model):

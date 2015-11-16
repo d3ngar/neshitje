@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.core.context_processors import csrf
 from .forms import UserRegForm, BillingForm, PostalForm, LoginForm, ChangeEmailForm, ChangePasswordForm, ChangeNameForm, CloseAccountForm, ChangeEmailOptinForm, ChangePhoneForm
 from .models import UserBilling, UserShipping
+from main_app.models import Status
 
 import main_app.recaptcha_simple
 
@@ -16,39 +17,47 @@ def add_billing(request):
     if request.user.is_authenticated():
         user_id = request.user
 
-        try:
-            billing = UserBilling.objects.get(user_id=user_id, status=1)
-
-            if billing is not None:
-                if request.method == 'POST':
-                    billing.status = 3
-                    billing.save()
-                    form = BillingForm(request.POST)
-                    if form.is_valid():
-                        form.save(user_id)
-                        response = redirect('user_details:account')
-                        return response
-                form = BillingForm(instance=billing)
-                return render(request, 'user_details/add_billing_address.html', {'form' : form})
-        except:
-            print "No billing address"
-
         if request.method == 'POST':
             form = BillingForm(request.POST)
             if form.is_valid():
-                print "Billing success"
+                try:
+                    billing = UserBilling.objects.get(user_id=user_id, status=1)
+                    if billing is not None:
+                        billing.status = Status.objects.get(pk=3)
+                        billing.save()
+
+                except:
+                    print "this is the first billing address"
+
                 form.save(user_id)
 
                 if request.POST.get('save') == 'submit':
+                    messages.success(request, "Billing address created!")
                     response = redirect('user_details:account')
-                    return response
-                elif request.POST.get('add_shipping') == 'submit':
-                    response = redirect('user_details:add-shipping')
-                    return response
 
-            return render(request, 'user_details/add_billing_address.html', {'form' : form})
+                elif request.POST.get('add_shipping') == 'submit':
+                    messages.success(request, "Billing address created!")
+                    response = redirect('user_details:add-shipping')
+
+                else:
+                    response = redirect('user_details:account')
+
+                return response
+
+            else:
+                messages.warning(request, "Your billing address couldn't be updated")
+                form = BillingForm(instance=billing)
+                return render(request, 'user_details/add_billing_address.html', {'form' : form})
+
         else:
-            form = BillingForm()
+            billing = None
+            try:
+                billing = UserBilling.objects.get(user_id=user_id, status=1)
+            except:
+                #messages.info(request, "This would be your first billing address")
+                print "this is the first billing address"
+
+            form = BillingForm(instance=billing)
             return render(request, 'user_details/add_billing_address.html', {'form': form})
 
     else:
@@ -66,6 +75,7 @@ def add_postal(request):
             if form.is_valid():
                 print "Postal success"
                 form.save(user_id)
+                messages.success(request, "Postal address added!")
                 response = redirect('user_details:account')
                 return response
 
@@ -126,7 +136,9 @@ def logout_process(request):
             user.userdetail.status_id = 3
             user.userdetail.save()
             user.save()
+            messages.success(request, "Your account eas successfully deactivated.")
     auth.logout(request)
+    messages.success(request, "Logged out!")
     return redirect('main_app:homepage')
 
 
@@ -139,6 +151,7 @@ def register(request):
             if form.is_valid():
                 print "User reg form success"
                 form.save()
+                messages.success(request, "Account created!")
                 if request.POST.get('details') == 'submit':
                     response = redirect('user_details:add-billing')
                 else:
@@ -148,7 +161,7 @@ def register(request):
                 return render(request, 'user_details/register_base.html', {'form' : form})
         else:
             # return the form
-            print "Form not passed. Recaptcha wrong."
+            messages.warning(request, "The re-captcha was most likely wrong!")
             response = redirect('user_details:register')
             response['Location'] += '?fail=recaptcha'
             return response
@@ -162,12 +175,8 @@ def delete_postal(request):
         post_add = UserShipping.objects.get(id=postal_id)
         post_add.status = 3
         post_add.save();
+        messages.success(request, "Postal address deleted!")
     return render(request, 'user_details/account.html', {})
-
-
-def postal_done(request):
-    return render(request, 'user_details/account.html', {})
-
 
 
 def account(request):
@@ -182,13 +191,14 @@ def edit_phone(request):
         if form.is_valid():
             print "User reg form success"
             form.save()
+            messages.success(request, "Phone number updated.")
             response = redirect('user_details:account')
             return response
         else:
-            return render(request, 'user_details/simple_form.html', {'form' : form})
+            messages.warning(request, "Phone number not updated.")
+            return render(request, 'user_details/edit_phone.html', {'form' : form})
 
-    form = UserRegForm()
-    return render(request, 'user_details/simple_form.html', {'form' : form})
+    return render(request, 'user_details/edit_phone.html', {'form' : form})
 
 def edit_email(request):
     if request.method == 'POST':
@@ -202,12 +212,15 @@ def edit_email(request):
                 auth.login(request, user)
                 user.email = email
                 user.save()
+                messages.success(request, "Email address updated")
                 response = redirect('user_details:account')
                 return response
             else:
-                response = redirect('user_details:register')
+                messages.warning(request, "Email address not updated")
+                response = redirect('user_details:edit-email')
                 return response
         else:
+            messages.warning(request, "Email address not updated")
             return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
     form = ChangeEmailForm()
     return render(request, 'user_details/edit_email.html', {'form':form, 'obj':'user_details:edit-email'})
@@ -227,12 +240,15 @@ def edit_password(request):
                 auth.login(request, user)
                 user.set_password(new_pass)
                 user.save()
+                messages.success(request, "Your password has been updated")
                 response = redirect('user_details:account')
                 return response
             else:
-                response = redirect('user_details:register')
+                messages.warning(request, "Your password was not updated")
+                response = redirect('user_details:edit-password')
                 return response
         else:
+            messages.warning(request, "Your password was not updated")
             return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
     form = ChangePasswordForm()
     return render(request, 'user_details/edit_password.html', {'form':form, 'obj':'user_details:edit-password'})
@@ -246,7 +262,7 @@ def switch_marketing(request):
             optin = request.POST.get('optin', '')
             request.user.userdetail.marketing_optin = optin
             request.user.userdetail.save()
-
+            messages.success(request, "Marketing preferences updated.")
         optin = request.user.userdetail.marketing_optin
         form = ChangeEmailOptinForm()
         return render(request, 'user_details/edit_marketing.html', {'form':form, 'optin':optin})
@@ -267,12 +283,15 @@ def edit_name(request):
                 user.first_name = firstname
                 user.last_name = lastname
                 user.save()
+                messages.success(request, "Your name has been updated successfully")
                 response = redirect('user_details:account')
                 return response
             else:
+                messages.warning(request, "Your name couldn't be updated")
                 response = redirect('user_details:register')
                 return response
         else:
+            messages.warning(request, "Your name couldn't be updated")
             return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
     form = ChangeNameForm()
     return render(request, 'user_details/edit_name.html', {'form':form, 'obj':'user_details:edit-name'})
@@ -310,9 +329,11 @@ def edit_phone(request):
             user_id.userdetail.phone_number = phone
             print user_id.userdetail.phone_number
             user_id.userdetail.save()
+            messages.success(request, "Your phone number has been udpated.")
             response = redirect('user_details:account')
             return response
         else:
+            messages.warning(request, "Your phone number could not be updated.")
             return render(request, 'user_details/edit_phone.html', {'form':form, 'obj':'user_details:edit-phone'})
     else:
         form = ChangePhoneForm()

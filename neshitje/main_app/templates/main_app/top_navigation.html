@@ -1,4 +1,4 @@
-<nav class="navbar navbar-fixed-top navbar-default">
+
   <div id="logo-header" class="container-fluid"><a href="/" title="N&#235; Shitje Homepage">N&#235; Shitje</a></div>
   <div id="tagline" class="container-fluid">The place to buy and sell</div>
 
@@ -48,24 +48,20 @@
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="{% url 'main_app:homepage' %}"><span class="glyphicon glyphicon-shopping-cart"></span> Basket</a></li>
-      <li><a href="{% url 'user_details:register' %}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
       {% if user.is_authenticated %}
+        <li><a href="{% url 'user_details:account' %}"><span class="glyphicon glyphicon-user"></span> My Account</a></li>
         <li><a href="{% url 'user_details:logout' %}"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
       {% else %}
+        <li><a href="{% url 'user_details:register' %}"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
         <li><a href="#" data-toggle="modal" data-target="#signupModal"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
       {% endif %}
     </ul>
   </div>
 </div>
-{% block subnav %}
-{% endblock %}
-</nav>
-{% block extrapadding %}
-{% endblock %}
 
 
 <!-- Modal -->
-<div class="modal fade" id="signupModal" role="dialog">
+<div class="modal fade " id="signupModal" role="dialog" > <!-- Optional: data-backdrop="false" -->
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
