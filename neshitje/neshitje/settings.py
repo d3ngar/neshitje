@@ -41,8 +41,13 @@ INSTALLED_APPS = (
     # installed apps
     #'crispy_forms',
     #'bootstrap3',
+    ## does tweak forms and stuff dynamically in Django
     'widget_tweaks',
+    ## Resizing of images uses that
     'sorl.thumbnail',
+    ## Search on the site with Whoosh and Haystack
+    'whoosh',
+    'haystack',
     # written apps
     'main_app',
     'user_track',
@@ -133,3 +138,13 @@ RECAPTCHA_PRIVATE_KEY = Secrets.captcha_secret_key
 
 # close sessions at browser exit
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# settings for Whoosh
+WHOOSH_INDEX = os.path.join(BASE_DIR, 'whoosh/')
+# settings for Haystack
+HAYSTACK_CONNECTIONS = {
+    'default' : {
+        'ENGINE' : 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH' : WHOOSH_INDEX,
+    },
+}
