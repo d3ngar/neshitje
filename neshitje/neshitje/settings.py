@@ -48,12 +48,14 @@ INSTALLED_APPS = (
     ## Search on the site with Whoosh and Haystack
     'whoosh',
     'haystack',
+    #Modified Pre-order Tree Traversal
+    'mptt',
     # written apps
     'main_app',
     'user_track',
     'search',
     'order',
-    'product',
+    'listing',
     'user_details',
 )
 

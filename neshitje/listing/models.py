@@ -16,9 +16,9 @@ from mptt.models import MPTTModel, TreeForeignKey
 # Create your models here.
 
 def where_to_upload(instance, filename):
-    product = instance.product.id
+    listing = instance.listing.id
     user = instance.user.id
-    filename = 'product_images/' + str(user)  + "/" + str(product) + "/" + hashlib.md5(filename).hexdigest()+'.jpg'
+    filename = 'listing_images/' + str(user)  + "/" + str(product) + "/" + hashlib.md5(filename).hexdigest()+'.jpg'
     print "Created a unique filename: " + filename
     return filename
 
@@ -39,9 +39,9 @@ class Condition(models.Model):
 
 
 class Listing(models.Model):
-    product_name = models.CharField(max_length=100)
+    listing_name = models.CharField(max_length=100)
     supplier_id = models.CharField(max_length=75, null=True, blank=True)
-    product_description = models.TextField()
+    listing_description = models.TextField()
     price = models.DecimalField (max_digits=20, decimal_places=4, default=Decimal('0.0000'))
     status = models.ForeignKey(Status, default=1)
     in_stock = models.IntegerField(default=1)
@@ -53,11 +53,11 @@ class Listing(models.Model):
     currency_code = models.ForeignKey(Currency)
 
     def __str__(self):
-        return self.product_name
+        return self.listing_name
 
 
 class ListingImage(models.Model):
-    product = models.ForeignKey(Listing)
+    listing = models.ForeignKey(Listing)
     status = models.ForeignKey(Status, default=1)
     user = models.ForeignKey(User)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
@@ -72,7 +72,7 @@ class ListingImage(models.Model):
             image.save(output, format='JPEG', quality=85)
             output.seek(0)
             self.image = InMemoryUploadedFile(output,'ImageField', "%s.jpg" %self.image.name, 'image/jpeg', output.len, None)
-        super(ProductImage, self).save()
+        super(ListingImage, self).save()
 
     def __str__(self):
         return self.image
@@ -80,10 +80,18 @@ class ListingImage(models.Model):
 
 class CategoryTree(MPTTModel):
     category_name = models.CharField(max_length=100, unique=True)
-    parent = TreeForeignKey('self', null=True, blank=True, related_name="sub_ctegoty", db_index=True)
+    custom_order = models.PositiveIntegerField(default=1)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name="sub_category", db_index=True)
 
     class MPTTMeta:
-        order_insertion_by = ['category_name']
+        order_insertion_by = ['custom_order']
+
+    def save(self, *args, **kwargs):
+        super(CategoryTree, self).save(*args, **kwargs)
+        CategoryTree.objects.rebuild()
+
+    def __str__(self):
+        return self.category_name
 
 
 class Attribute(models.Model):
@@ -101,6 +109,10 @@ class AttributeChoices(models.Model):
 
     def __str__(self):
         return self.choice
+
+class AttributeMapping(models.Model):
+    attribute = models.ForeignKey(Attribute)
+    category = models.ForeignKey(CategoryTree)
 
 
 """

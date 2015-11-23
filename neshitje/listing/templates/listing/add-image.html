@@ -5,7 +5,7 @@
 <div class="container">
   <h1>Add images</h1>
   {{ form.non_field_errors }}
-  <form name="add-image" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'product:image-upload' %}" enctype="multipart/form-data">
+  <form name="add-image" class="form-horizontal" role="form" method="post" onsubmit="return validateForm();"  action="{% url 'listing:image-upload' %}" enctype="multipart/form-data">
     {% csrf_token %}
     {#% render_field form.product value=prod_id %#}
     <div class="form-group">
