@@ -1,7 +1,7 @@
 from suit.admin import SortableModelAdmin
 from mptt.admin import MPTTModelAdmin
 from django.contrib import admin
-from .models import Currency, Condition, Listing, ListingImage, CategoryTree
+from .models import Currency, Condition, Listing, ListingImage, CategoryTree, Attribute, AttributeChoices, AttributeMapping
 # Register your models here.
 
 class CurrencyAdmin(admin.ModelAdmin):
@@ -27,6 +27,25 @@ class ListingImageAdmin(admin.ModelAdmin):
         model = ListingImage
 
 admin.site.register(ListingImage)
+
+class AttributeAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Attribute
+
+admin.site.register(Attribute)
+
+class AttributeChoicesAdmin(admin.ModelAdmin):
+    class Meta:
+        model = AttributeChoices
+
+admin.site.register(AttributeChoices)
+
+class AttributeMappingAdmin(admin.ModelAdmin):
+    class Meta:
+        model = AttributeMapping
+
+admin.site.register(AttributeMapping)
+
 
 
 class CategoryTreeAdmin(MPTTModelAdmin, SortableModelAdmin):
