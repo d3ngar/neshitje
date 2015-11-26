@@ -131,7 +131,7 @@ if DEBUG:
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-MEDIA_ROOT = '/home/dengar/Documents/development/neshitje/neshitje/media/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/uploads')
 #MEDIA_URL = ''
 
 # recaptcha

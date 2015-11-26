@@ -50,6 +50,11 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Files created automatically
+.DS_Store
+*~
+
 #other files
 nonrepofiles/
 secrets.py
+test.html
