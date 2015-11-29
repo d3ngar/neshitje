@@ -108,11 +108,17 @@ USE_TZ = True
 # Setting up all sorts of email things:
 # For email
 if not DEBUG:
+    #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+    #EMAIL_USE_TLS=True
+    #EMAIL_USE_SSL=True
+    DEFAULT_FROM_EMAIL = 'do-not-reply@neshitje.com'
+    SERVER_EMAIL = 'do-not-reply@neshitje.com'
+    EMAIL_USE_TLS = True
     EMAIL_HOST = Secrets.email_host
     EMAIL_PORT = 465
-    EMAIL_USERNAME = Secrets.email_username
-    EMAIL_PASSWORD = Secrets.email_password
+    EMAIL_HOST_USER = Secrets.email_username
+    EMAIL_HOST_PASSWORD = Secrets.email_password
 
 
 ## For debugging, but you will also need to run python -m smtpd -n -c DebuggingServer localhost:1025

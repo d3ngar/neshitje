@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import UserDetail, UserBilling, UserShipping
 from .validators import validate_email_unique
+from django.core.mail import EmailMultiAlternatives
 
 class UserRegForm(UserCreationForm):
     first_name = forms.CharField(label="Firstname")
@@ -27,7 +28,36 @@ class UserRegForm(UserCreationForm):
             detail.phone_number = self.cleaned_data['phone']
             detail.save()
 
+        self.send_welcome_email()
+
         return user
+
+    def send_welcome_email(self):
+        subject, from_email, to = 'Welcome to Neshitje', 'info@neshitje.com', self.cleaned_data['email']
+        text_content = """
+            Hello """ + self.cleaned_data['first_name'] + """,
+
+            We have created an account for www.neshitje.com for your email address.
+            Your username is """ + self.cleaned_data['username'] + """.
+
+            You are now free to post and send and receive messages.
+
+            - The Ne Shitje team
+        """
+        html_content = """
+            <p>Hello """ + self.cleaned_data['first_name'] + """,</p>
+
+            <p>We have created an account for <a href="www.neshitje.com" title="Ne Shitje">Ne Shitje</a> for your email address.
+            Your username is: <strong>""" + self.cleaned_data['username'] + """</strong>.</p>
+
+            <p>You are now free to post and send and receive messages.</p>
+
+            <p>- The Ne Shitje team</p>
+        """
+        msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
 
 class BillingForm(forms.ModelForm):
     class Meta:
