@@ -31,15 +31,15 @@ class Currency(models.Model):
     def __str__(self):
         return self.currency_code
 
-class Condition(models.Model):
-    condition_description = models.CharField(max_length=20)
+class ListingType(models.Model):
+    listing_type = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.condition_description
-
+        return self.listing_type
 
 class Listing(models.Model):
     listing_name = models.CharField(max_length=100)
+    listing_type = models.ForeignKey(ListingType)
     supplier_id = models.CharField(max_length=75, null=True, blank=True)
     listing_description = models.TextField()
     price = models.DecimalField (max_digits=20, decimal_places=4, default=Decimal('0.0000'))
@@ -47,7 +47,6 @@ class Listing(models.Model):
     in_stock = models.IntegerField(default=1)
     user = models.ForeignKey(User)
     keywords = models.CharField(max_length=4000, null=True, blank=True)
-    condition = models.ForeignKey(Condition)
     date_added = models.DateTimeField("Date Created", null=True, auto_now_add=True, auto_now=False)
     status_changed = models.DateTimeField("Date Created", null=True, auto_now_add=False, auto_now=True)
     currency_code = models.ForeignKey(Currency)
@@ -105,7 +104,7 @@ class Attribute(models.Model):
 class AttributeChoices(models.Model):
     attribute = models.ForeignKey(Attribute)
     choice = models.CharField(max_length=100)
-    choice_numer = models.IntegerField(null=True)
+    choice_number = models.IntegerField(null=True)
 
     def __str__(self):
         return self.choice
@@ -114,6 +113,10 @@ class AttributeMapping(models.Model):
     attribute = models.ForeignKey(Attribute)
     category = models.ForeignKey(CategoryTree)
 
+class AttributeDenomination(models.Model):
+    attribute = models.ForeignKey(Attribute)
+    listing = models.ForeignKey(Listing)
+    denomination = models.IntegerField(null=True, blank=True)
 
 """
 
